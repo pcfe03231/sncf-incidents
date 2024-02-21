@@ -1,0 +1,11 @@
+*.py[cod]
+*.log
+*.csv
+*.xlsx
+*.pbix
+*.pptx
+*.DS_Store
+
+.pytest_cache
+.venv
+.vscode
