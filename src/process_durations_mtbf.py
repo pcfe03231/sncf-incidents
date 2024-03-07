@@ -1,4 +1,3 @@
-import os
 import numpy as np
 import pandas as pd
 import re
@@ -10,16 +9,16 @@ from import_export import *
 
 def process_durations(df):
     """
-    Calcul des durées entre date de début d'incident, pour chaque triplet (pr_debut, pr_fin, code_ligne).
+    Calcul des durées entre date de début d'incident, pour chaque localisation (pr_debut, pr_fin).
     """
-    
+
     logging.info("start")
 
     # création colonne qui stocke la durée et qui rajoute une information à l'incident qui a rompu le temps sans incident)
     df = df.assign(durees=np.nan)
     df.sort_values("date_de_debut_min", inplace=True)
 
-    # boucle sur les couples (item) de PR unique, calcul des durées entre 2 incidents pour un même couple
+    # boucle sur les couples uniques (item) de PR, calcul des durées entre 2 incidents pour un même couple
     for i, item in (
         df[
             [
@@ -32,7 +31,7 @@ def process_durations(df):
     ):
         mask_pr = (df["pr_debut_ref"] == item["pr_debut_ref"]) & (
             df["pr_fin_ref"] == item["pr_fin_ref"]
-        )  #
+        )
         df.loc[mask_pr, "durees"] = (
             df.loc[mask_pr, "date_de_debut_min"].diff().dt.total_seconds()
             / (60 * 60 * 24)
@@ -46,13 +45,14 @@ def process_mtbf(df, **kwargs):
     Calcul des indicateurs à partir des durées entre les incidents, pour chaque couple (pr_debut, pr_fin).\n
     Plusieurs MTBF parmis les indicateurs : durées Minimales/Médianes/Maximales entre 2 incidents.
     """
-    
+
     logging.info("start")
 
     date_min = get_kwargs(kwargs, "date_min")
     date_max = get_kwargs(kwargs, "date_max")
     is_localization_simplified = get_kwargs(kwargs, "is_localization_simplified")
 
+    # agrégation du dataframes des durées selon la localisation par PR de début et PR de fin
     df = df.groupby(
         by=["pr_debut_ref", "pr_fin_ref"],
         as_index=False,
@@ -82,6 +82,7 @@ def process_mtbf(df, **kwargs):
         ),
     )
 
+    # si la localisation des icd est ramenée au PR de début, nouvelle agrégation du dataframe ci-dessus via l'application d'un nouveau groupby
     if is_localization_simplified:
         df = df.groupby(
             by=["pr_debut_ref"],
@@ -125,7 +126,7 @@ def process_mtbf(df, **kwargs):
                 ),
             ),
         )
-    
+
     # nettoyage de liste_code_ligne
     df["liste_code_ligne"] = df["liste_code_ligne"].apply(
         lambda x: re.sub(r"\[|\]|\{|\}", "", str(x)).strip()
@@ -177,19 +178,20 @@ def process_mtbf(df, **kwargs):
 
 def process_tot(**kwargs):
     """
-    Création du dataframe avec les durées, 1 ligne = 1 durée entre icd, avec les carac de l'icd qui a stoppé la durée sans incident).\n
-    Création du dataframe avec les MTBF, 1 ligne = 1 triplet (pr_debut, pr_fin, code_ligne).\n
-    Les durées (et les MTBF) sont calculées sans distinction de la définition des infrastructures concernés par les incidents.
+    Création du dataframe avec les durées, 1 ligne = 1 durée entre icd, avec les carac de l'icd qui a stoppé la durée sans incident.\n
+    Création du dataframe avec les mtbf, 1 ligne = des statistiques sur les données pour une localisation définie.\n
+    Les durées (et les mtbf) sont calculées sans distinction de la définition des infrastructures concernés par les incidents.
     """
-    
+
     logging.info("start")
 
     inter_folder = get_kwargs(kwargs, "inter_folder")
+    output_folder = get_kwargs(kwargs, "output_folder")
 
     # import data icd
     df_icd = import_data(inter_folder, "infra_incidents_idf.csv")
 
-    # nettoyage date de début
+    # date de début d'icd au format datetime
     df_icd["date_de_debut_min"] = pd.to_datetime(
         df_icd["date_de_debut_min"], format="mixed"
     )
@@ -203,18 +205,18 @@ def process_tot(**kwargs):
 
     # export data durées et mtbf sans distinction de l'infra
     export_data(df_durees, inter_folder, "durations_tot.csv")
-    export_data(df_mtbf, inter_folder, "mtbf_tot.csv")
+    export_data(df_mtbf, output_folder, "mtbf_tot.csv")
 
 
 def process_infra(**kwargs):
     """
-    Création du dataframe avec les durées, 1 ligne = 1 durée entre icd, avec les carac de l'icd qui a stoppé la durée sans incident).\n
-    Création du dataframe avec les MTBF, 1 ligne = 1 triplet (pr_debut, pr_fin, code_ligne).\n
-    Les durées (et les MTBF) sont calculées avec distinction de la définition des infrastructures concernés par les incidents.
+    Création du dataframe avec les durées, 1 ligne = 1 durée entre icd, avec les carac de l'icd qui a stoppé la durée sans incident.\n
+    Création du dataframe avec les mtbf, 1 ligne = des statistiques sur les données pour une localisation définie.\n
+    Les durées (et les mtbf) sont calculées avec distinction de la définition des infrastructures concernés par les incidents.
     """
 
     logging.info("start")
-    
+
     inter_folder = get_kwargs(kwargs, "inter_folder")
     output_folder = get_kwargs(kwargs, "output_folder")
 

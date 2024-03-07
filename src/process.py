@@ -12,11 +12,10 @@ from matching import matching
 
 
 def single_process(**kwargs):
-    """Traitement unique sur l'intervalle de temps délimité par date_min et date_max"""
+    """Traitement unique sur un intervalle de temps délimité par date_min et date_max."""
     
     logging.info("start")
 
-    inter_folder = get_kwargs(kwargs, "inter_folder")
     output_folder = get_kwargs(kwargs, "output_folder")
     date_min = get_kwargs(kwargs, "dates_itv")[0][0]
     date_max = get_kwargs(kwargs, "dates_itv")[0][1]
@@ -24,8 +23,8 @@ def single_process(**kwargs):
     kwargs.update({"date_max": date_max})
 
     # supprimer les fichiers de données s'ils existent déjà
-    if os.path.isfile(os.path.join(inter_folder, "mtbf_tot.csv")):
-        os.remove(os.path.join(inter_folder, "mtbf_tot.csv"))
+    if os.path.isfile(os.path.join(output_folder, "mtbf_tot.csv")):
+        os.remove(os.path.join(output_folder, "mtbf_tot.csv"))
 
     if os.path.isfile(os.path.join(output_folder, "mtbf_infra.csv")):
         os.remove(os.path.join(output_folder, "mtbf_infra.csv"))
@@ -45,17 +44,16 @@ def single_process(**kwargs):
 
 
 def multi_process(**kwargs):
-    """Traitements multiples sur les intervalles de temps délimités par dates_itv"""
+    """Traitements multiples sur les intervalles de temps délimités par dates_itv."""
     
     logging.info("start")
 
-    inter_folder = get_kwargs(kwargs, "inter_folder")
     output_folder = get_kwargs(kwargs, "output_folder")
     dates_itv = get_kwargs(kwargs, "dates_itv")
 
     # supprimer les fichiers de données s'ils existent déjà
-    if os.path.isfile(os.path.join(inter_folder, "mtbf_tot_itv.csv")):
-        os.remove(os.path.join(inter_folder, "mtbf_tot_itv.csv"))
+    if os.path.isfile(os.path.join(output_folder, "mtbf_tot_itv.csv")):
+        os.remove(os.path.join(output_folder, "mtbf_tot_itv.csv"))
 
     if os.path.isfile(os.path.join(output_folder, "mtbf_infra_itv.csv")):
         os.remove(os.path.join(output_folder, "mtbf_infra_itv.csv"))
@@ -79,8 +77,8 @@ def multi_process(**kwargs):
 
         # renommage des fichiers de données mtbf
         os.rename(
-            os.path.join(inter_folder, f"mtbf_tot.csv"),
-            os.path.join(inter_folder, f"mtbf_tot_itv{i}.csv"),
+            os.path.join(output_folder, f"mtbf_tot.csv"),
+            os.path.join(output_folder, f"mtbf_tot_itv{i}.csv"),
         )
         os.rename(
             os.path.join(output_folder, f"mtbf_infra.csv"),
@@ -90,16 +88,15 @@ def multi_process(**kwargs):
 
 def concat_data(**kwargs):
     """
-    Dans le cas où les traitement sont réalisés sur plusieurs intervalles de temps, concaténation en seul fichier des données de sortie.
+    Dans le cas d'un traitement multiple, concaténation en un seul fichier des données de sortie.
     """
     
     logging.info("start")
 
-    inter_folder = get_kwargs(kwargs, "inter_folder")
     output_folder = get_kwargs(kwargs, "output_folder")
 
     # récupérer les noms de fichiers par intervalle de temps dans output_folder et créer les df vides
-    tot_files = sorted(glob(os.path.join(inter_folder, "mtbf_tot_itv*.csv")))
+    tot_files = sorted(glob(os.path.join(output_folder, "mtbf_tot_itv*.csv")))
     infra_files = sorted(glob(os.path.join(output_folder, "mtbf_infra_itv*.csv")))
     df_tot = pd.DataFrame(None, columns=cols_mtbf_tot)
     df_infra = pd.DataFrame(None, columns=cols_mtbf_infra)
@@ -122,28 +119,29 @@ def concat_data(**kwargs):
         os.remove(infra_file)
 
     # exporter df tot
-    export_data(df_tot, inter_folder, "mtbf_tot_itv.csv")
+    export_data(df_tot, output_folder, "mtbf_tot_itv.csv")
 
     # exporter df infra
     export_data(df_infra, output_folder, "mtbf_infra_itv.csv")
 
 
 def process(**kwargs):
-    """Traitement unique (sur un seul intervalle de temps) ou multiple (sur plusieurs intervalles de temps)"""
+    """Traitement unique (sur un seul intervalle de temps) ou multiple (sur plusieurs intervalles de temps)."""
     
     logging.info("start")
 
     dates_itv = get_kwargs(kwargs, "dates_itv")
 
-    # traitement sur un seul intervalle, délimité par date_min et date_max dans constants
+    # traitement sur un seul intervalle, délimité par date_min et date_max 
     if len(dates_itv) == 1:
         single_process(**kwargs)
 
-    # traitement sur plusieurs intervalles, délimités par dates_itv dans constants
+    # traitement sur plusieurs intervalles, délimités par dates_itv
     if len(dates_itv) > 1:
         multi_process(**kwargs)
         concat_data(**kwargs)
 
 
 if __name__ == "__main__":
+    # traitement (unique)
     process()

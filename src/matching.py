@@ -27,7 +27,7 @@ def matching_pr(**kwargs):
     # import data icd (PR pour matching : pr_debut et pr_fin)
     df_tot = import_data(inter_folder, "infra_incidents_tot.csv")
 
-    # dataframe qui a 1 colonne pr_icd, regroupe les PR début ou fin des données icd en 1 seule colonne
+    # dataframe qui a 1 colonne pr_icd, regroupe en 1 seule colonne les PR de début ou de fin dans les données icd
     df_pr = pd.DataFrame(
         df_tot[["pr_debut", "pr_fin"]].stack().reset_index(drop=True),
         columns=["pr_icd"],
@@ -88,7 +88,7 @@ def matching_pr(**kwargs):
         )
     )
 
-    # suppression icd hors idf, suppression des colonnes booléennes qui indiquent si pr est en idf
+    # suppression icd hors idf (PR début et PR fin sont hors idf), suppression de ces colonnes booléennes qui indiquent si pr est en idf
     list_col_en_idf = ["pr_debut_en_idf", "pr_fin_en_idf"]
     df_idf = df_tot.loc[df_tot[list_col_en_idf].all(axis="columns"), :].drop(
         columns=list_col_en_idf
@@ -141,7 +141,7 @@ def matching_code_ligne(**kwargs):
         )
     ).drop(columns=["code_ligne_debut", "code_ligne_fin"])
 
-    # unlist si la liste n'a qu'un element, mettre valeur manquante si la liste est vide
+    # unlist si la liste n'a qu'un élément, mettre valeur manquante si la liste est vide
     def unlist(x):
         if type(x) is list:
             if len(x) == 1:
@@ -186,10 +186,8 @@ def post_matching(**kwargs):
     # import data référence (PR pour matching : pr_ref)
     df_ref = import_data(output_folder, "referentiel_pr.csv")
 
-    # supprimer les pr_ref sans code_ligne, mettre code_ligne et pk en entier
-    df_ref = df_ref.loc[~df_ref["code_ligne"].isna(), :].astype(
-        {"code_ligne": "int", "pk": "int"}
-    )
+    # supprimer les pr_ref sans code_ligne
+    df_ref = df_ref.loc[~df_ref["code_ligne"].isna(), :]
 
     # export data référence
     export_data(df_ref, output_folder, "referentiel_pr.csv")

@@ -1,4 +1,3 @@
-import os
 import numpy as np
 import pandas as pd
 import logging
@@ -8,7 +7,7 @@ from import_export import *
 
 
 def join_PR1(df_mtbf, df_icv, key, df_ref, type_infra):
-    """Traitements uniquement pour incidents en gare / sur un même PR."""
+    """Jointure des data mtbf sur les data icv pour les incidents en gare / sur un même PR."""
     
     logging.info("start")
 
@@ -109,7 +108,7 @@ def join_PR1(df_mtbf, df_icv, key, df_ref, type_infra):
 
 
 def join_PR2(df_mtbf, df_icv, df_ref, type_infra):
-    """Traitements uniquement pour incidents hors gare / sur un couple de PR."""
+    """Jointure des data mtbf sur les data icv pour les incidents hors gare / sur un couple de PR."""
     
     logging.info("start")
 
@@ -293,7 +292,7 @@ def merge_iter(df, df_icv, key):
         ]
     ].round(2)
 
-    # rajout de df12 aux data icv de l'iteration df_icv_
+    # rajout de df12 aux data icv de l'iteration df_icv
     df_icv.reset_index(drop=True, inplace=True)
     df_icv = pd.merge(
         df_icv,
@@ -333,7 +332,7 @@ def merge_mtbf_to_icv(output_folder, infra, key, years):
     df_mtbf = import_data(output_folder, "mtbf_infra_itv.csv")
     df_mtbf = df_mtbf[df_mtbf["infra"] == infra].drop(columns=["infra"])
 
-    # import data référence de pr
+    # import data référence pr
     df_ref = import_data(output_folder, "referentiel_pr.csv")
 
     # import data icv
@@ -393,7 +392,7 @@ def merge_mtbf_to_icv(output_folder, infra, key, years):
         ):
             df12 = control_duplicates(df=df12, df_icv=df_icv_, key=key)
 
-        # transformations intermédiaires de df12 (data icv+mtbf sur les infra qui ont des icd) et jointure les data icv de l'itération (année y)
+        # transformations intermédiaires de df12 (data icv+mtbf sur les infra qui ont des icd) et jointure finale de l'itération (année y)
         df_icv_ = merge_iter(df=df12, df_icv=df_icv_, key=key)
 
         # rajout des data icv de l'iteration aux data icv finales réunissant toutes les années
@@ -411,30 +410,30 @@ if __name__ == "__main__":
         years=[2018, 2019, 2020, 2021, 2022, 2023],
     )
 
-    # merge_mtbf_to_icv(
-    #     output_folder="data_output5",
-    #     infra="ADV",
-    #     key="CLE_ADV",
-    #     years=[2018, 2019, 2020, 2021, 2022, 2023],
-    # )
+    merge_mtbf_to_icv(
+        output_folder="data_output5",
+        infra="ADV",
+        key="CLE_ADV",
+        years=[2018, 2019, 2020, 2021, 2022, 2023],
+    )
 
-    # merge_mtbf_to_icv(
-    #     output_folder="data_output5",
-    #     infra="CAT",
-    #     key="ID",
-    #     years=[2018, 2019, 2020, 2021, 2022, 2023],
-    # )
+    merge_mtbf_to_icv(
+        output_folder="data_output5",
+        infra="CAT",
+        key="ID",
+        years=[2018, 2019, 2020, 2021, 2022, 2023],
+    )
 
-    # merge_mtbf_to_icv(
-    #     output_folder="data_output5",
-    #     infra="EALE",
-    #     key="ID_ARMEN",
-    #     years=[2018, 2019, 2020, 2021, 2022, 2023],
-    # )
+    merge_mtbf_to_icv(
+        output_folder="data_output5",
+        infra="EALE",
+        key="ID_ARMEN",
+        years=[2018, 2019, 2020, 2021, 2022, 2023],
+    )
 
-    # merge_mtbf_to_icv(
-    #     output_folder="data_output5",
-    #     infra="SIG",
-    #     key="ID",
-    #     years=[2018, 2019, 2020, 2021, 2022, 2023],
-    # )
+    merge_mtbf_to_icv(
+        output_folder="data_output5",
+        infra="SIG",
+        key="ID",
+        years=[2018, 2019, 2020, 2021, 2022, 2023],
+    )
