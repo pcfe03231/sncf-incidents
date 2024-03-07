@@ -3,9 +3,10 @@
 import os
 import pandas as pd
 
+
 # %% import data sig_icv d'origine (avec Critères et Valeur)
 df = pd.read_csv(
-    "../data_input_icv/sig_icv_.csv",
+    "../data_input_icv/sig_icv.csv",
     sep=";",
     encoding="latin-1",
     low_memory=False,
@@ -50,7 +51,7 @@ df_ = df_.pivot(
         "ELEC",
         "STATUT",
         "UIC",
-        "GR_UIC_init",
+        "GR_UIC_INIT",
         "ANNEE",
         "NB_AS_GLOBAL",
         "AGE_MOYEN_AS_GLOBAL",

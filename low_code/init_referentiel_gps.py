@@ -1,14 +1,14 @@
-# %% stocker toutes les coordonnées (longitude, latitude) uniques
+# %% stocker toutes les coordonnées gps uniques dans referentiel_gps (viz1 et viz2)
 import pandas as pd
 import os
 
-#viz3
+#viz1
 # %%
 df_gps = pd.DataFrame(columns=["X", "Y"])
 
 # %%
 df_ref = pd.read_csv(
-    os.path.join("../data_output3", "referentiel_pr.csv"),
+    os.path.join("../data_output1", "referentiel_pr.csv"),
     sep="\t",
     encoding="utf-16",
     low_memory=False,
@@ -19,14 +19,14 @@ df_gps[["X", "Y"]] = df_ref[["longitude", "latitude"]].drop_duplicates(ignore_in
 
 # %%
 df_gps.to_csv(
-    os.path.join("../data_output3", "referentiel_gps.csv"),
+    os.path.join("../data_output1", "referentiel_gps.csv"),
     sep="\t",
     encoding="utf-16",
     index=False,
     lineterminator="\n",
 )
 
-#viz4
+#viz2
 # %%
 icv_files = [
     "sig_icv.csv",

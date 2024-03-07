@@ -1,4 +1,4 @@
-# %% import modules + definition data folder
+# %% première étape dans la création de referentiel_definition_incident par la création de triplet_unique
 import os
 from glob import glob
 import pandas as pd
@@ -36,7 +36,6 @@ for input_file in input_files:
 
 
 # %% triplets (type incident, type defaillance, type ressource defaillante) uniques, toute année confondue
-
 df_ref.rename(
     columns={
         "type_incident": "IO - Type d'incident",
@@ -48,7 +47,6 @@ df_ref.rename(
 
 
 # %% export triplets_uniques
-
 df_ref.to_csv(
     os.path.join(input_folder, "triplets_uniques.csv"),
     sep="\t",
@@ -57,16 +55,12 @@ df_ref.to_csv(
 )
 
 # %%
-# regroupement / classification a été réalisée à la main
+# étape de regroupement / de classification est réalisé à la main
 # le fichier avec la classification a été mis dans data_input sous le nom : referentiel_definition_incident.csv
 # triplets cohérents/corrects sont associés à : VOIE, ADV, CAT, EALE, PN, TELECOM, TVX,
 # lesquels ne sont pas cohérentes/corrects ou sont hors périmètres : EXT
 
-# %% suppression triplets uniques
-
+# %% suppression du fichier des triplets uniques
 os.remove(os.path.join(input_folder, "triplets_uniques.csv"))
 
 
-
-
-# %%

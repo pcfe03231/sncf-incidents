@@ -1,22 +1,30 @@
-# %% Création des data referentiel_temps.csv
+# %% création des data referentiel_temps1.csv et referentiel_temps2.csv (viz1)
 import pandas as pd
 import datetime
 
-# %% data_output2
-df = pd.DataFrame(data=list(range(2010, 2026)), columns=["annee"])
+# %% ref temps par année
+df1 = pd.DataFrame(data=list(range(2010, 2026)), columns=["annee"])
 
 # %%
-df.to_csv(
-    "../data_output2/referentiel_temps.csv",
+df1.to_csv(
+    "../data_output1/referentiel_temps1.csv",
     sep="\t",
     encoding="utf-16",
     index=False,
     lineterminator="\n",
 )
 
+# %%
+df1.to_csv(
+    "../data_output3/referentiel_temps.csv",
+    sep="\t",
+    encoding="utf-16",
+    index=False,
+    lineterminator="\n",
+)
 
-# %% data_output3
-df = pd.DataFrame(
+# %% ref temps par saison
+df2 = pd.DataFrame(
     data=[
         [
             datetime.date(2016, 3, 20),
@@ -110,7 +118,7 @@ df = pd.DataFrame(
         ],
         [
             datetime.date(2023, 9, 23),
-            datetime.date(2024, 12, 22),
+            datetime.date(2023, 12, 22),
             "automne-hiver",
             "2023",
         ],
@@ -119,8 +127,8 @@ df = pd.DataFrame(
 )
 
 # %%
-df.to_csv(
-    "../data_output3/referentiel_temps.csv",
+df2.to_csv(
+    "../data_output1/referentiel_temps2.csv",
     sep="\t",
     encoding="utf-16",
     index=False,

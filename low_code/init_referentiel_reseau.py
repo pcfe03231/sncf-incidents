@@ -1,4 +1,4 @@
-# %%
+# %% création des data de réferentiel sur les années et les caractéristiques de réseau
 import pandas as pd
 import os
 
@@ -8,7 +8,7 @@ df_annee = pd.DataFrame(range(2010, 2024), columns=["annee"])
 
 # %%
 df_annee.to_csv(
-    os.path.join("../data_output4", "referentiel_annee.csv"),
+    os.path.join("../data_output2", "referentiel_annee.csv"),
     sep="\t",
     encoding="utf-16",
     index=False,
@@ -31,7 +31,7 @@ df_infrapole = pd.DataFrame(
 
 # %%
 df_infrapole.to_csv(
-    os.path.join("../data_output4", "referentiel_infrapole.csv"),
+    os.path.join("../data_output2", "referentiel_infrapole.csv"),
     sep="\t",
     encoding="utf-16",
     index=False,
@@ -47,13 +47,14 @@ df_uic = pd.DataFrame(
             "5 à 6",
             "7 à 9 AV",
             "7 à 9 SV",
+            "Inconnu",
         ],
     }
 )
 
 # %%
 df_uic.to_csv(
-    os.path.join("../data_output4", "referentiel_uic.csv"),
+    os.path.join("../data_output2", "referentiel_uic.csv"),
     sep="\t",
     encoding="utf-16",
     index=False,
@@ -76,7 +77,7 @@ df_densite = pd.DataFrame(
 
 # %%
 df_densite.to_csv(
-    os.path.join("../data_output4", "referentiel_densite.csv"),
+    os.path.join("../data_output2", "referentiel_densite.csv"),
     sep="\t",
     encoding="utf-16",
     index=False,
@@ -87,7 +88,7 @@ df_densite.to_csv(
 ### ligne
 # %%
 df_ligne = pd.read_csv(
-    os.path.join("../data_output4", "referentiel_pr.csv"),
+    os.path.join("../data_output2", "referentiel_pr.csv"),
     sep="\t",
     encoding="utf-16",
     low_memory=False,
@@ -96,7 +97,7 @@ df_ligne = pd.read_csv(
 
 # %%
 df_ligne.to_csv(
-    os.path.join("../data_output4", "referentiel_ligne.csv"),
+    os.path.join("../data_output2", "referentiel_ligne.csv"),
     sep="\t",
     encoding="utf-16",
     index=False,
@@ -107,7 +108,7 @@ df_ligne.to_csv(
 ### code ligne
 # %%
 df_codeligne = pd.read_csv(
-    os.path.join("../data_output4", "referentiel_pr.csv"),
+    os.path.join("../data_output2", "referentiel_pr.csv"),
     sep="\t",
     encoding="utf-16",
     low_memory=False,
@@ -137,7 +138,7 @@ df_codeligne.drop_duplicates(inplace=True, ignore_index=True)
 
 # %%
 df_codeligne.to_csv(
-    os.path.join("../data_output4", "referentiel_codeligne.csv"),
+    os.path.join("../data_output2", "referentiel_codeligne.csv"),
     sep="\t",
     encoding="utf-16",
     index=False,
