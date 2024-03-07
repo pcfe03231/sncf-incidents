@@ -135,7 +135,7 @@ def init_data_ref(**kwargs):
 
 def modify_PR(*args, **kwargs):
     """
-    Modifier des informations sur un PR dans les données de référentiels
+    Modifier des informations sur un PR dans les données de référentiels.
     """
     
     logging.info("start")
@@ -212,7 +212,7 @@ def add_PR(*args, **kwargs):
     """
     Ajoute des PR aux données de référentiels en se basant sur un PR existant.\n
     Duplique une ligne du dataframe, le seul champ qui change est 'pr_ref'.\n
-    L'input est sous la forme [new_PR, as_PR] qui correspondent à 2 PR nettoyés par la fonction clean_PR.\n
+    L'input est sous la forme (new_PR, as_PR) qui correspondent à 2 PR nettoyés par la fonction clean_PR.\n
     new_PR est un 'pr_ref' des données d'incidents, as_PR est un 'pr_ref' des données de référence.
     """
     
@@ -244,7 +244,7 @@ def add_PR(*args, **kwargs):
 
 
 def correct_data_ref(**kwargs):
-    """Corrections de PR réunis (ajout et modifications)"""
+    """Corrections de PR réunis (ajout et modifications)."""
     
     logging.info("start")
     

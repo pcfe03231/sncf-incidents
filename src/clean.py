@@ -3,17 +3,17 @@ import re
 
 
 def clean_endings(text):
-    """Supprime la chaîne '- word' à la fin d'une chaîne"""
+    """Supprime la chaîne '- word' à la fin d'une chaîne."""
     return re.sub(r"\s-\s\w+$", "", text)
 
 
 def clean_parenthese(text):
-    """Supprime les parenthèses et leurs contenus + les espaces indésirables"""
+    """Supprime les parenthèses et leurs contenus + les espaces indésirables."""
     return re.sub(r"\(|\)", "", text).strip()
 
 
 def clean_accents(text):
-    """Supprime les accents d'une chaîne de caractères"""
+    """Supprime les accents d'une chaîne de caractères."""
     try:
         nfkd_form = unicodedata.normalize("NFKD", text)
         return "".join([c for c in nfkd_form if not unicodedata.combining(c)])
@@ -22,11 +22,11 @@ def clean_accents(text):
 
 
 def clean_lower(text):
-    """Met en minuscule une chaîne de caractères"""
+    """Met en minuscule une chaîne de caractères."""
     return text.lower()
 
 def clean_special(text):
-    """Supprime les - intermediaires, +, /, ., espaces multiples"""
+    """Supprime les - intermediaires, +, /, ., espaces multiples."""
     text = text.replace("-", " ")
     text = text.replace("+", " ")
     text = text.replace("/", "")
@@ -36,7 +36,7 @@ def clean_special(text):
     return text
 
 def clean_PR(df, col_name_PR):
-    """Mise en forme des libellés de PR"""
+    """Mise en forme des libellés de PR."""
 
     return (
         df[col_name_PR]
@@ -48,14 +48,14 @@ def clean_PR(df, col_name_PR):
     )
     
 def clean_GPS(text):
-    """Mise en forme des coordonnées GPS"""
+    """Mise en forme des coordonnées GPS."""
     text = re.sub(r"POINT \(|\)", "", text).strip()
     coord = text.split(" ")
     coord = [float(c) for c in coord]
     return coord
 
 def clean_PK(text):
-    """Mise en forme des PK (suppression des '00')"""
+    """Mise en forme des PK (suppression des '00')."""
     return re.sub(r"00", "", text, count=1)
 
 

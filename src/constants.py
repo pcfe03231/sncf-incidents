@@ -5,7 +5,7 @@ encoding = "utf-16"
 sep = "\t"
 
 
-# fonction permettant de récupérer la valeur associée à la clef (key) dans le dictionnaire kwargs
+# fonction permettant de récupérer la valeur associée à la clef (key) dans un dictionnaire kwargs
 def get_kwargs(kwargs, key):
     """Fonction permettant de récupérer la valeur associée à la clef key dans le dictionnaire kwargs"""
     if kwargs.get(key) is not None:
@@ -14,12 +14,16 @@ def get_kwargs(kwargs, key):
         return eval(key)
 
 
-# dossiers qui regroupent les données et les logs (traitements par défaut)
+# dossiers qui regroupent les données et les logs
+logs_folder = "logs"  # dossier des logs
+input_icv_folder = "data_input_icv"  # dossier des données icv
 input_folder = "data_input"  # dossier des données brutes
 inter_folder = "data_inter"  # dossier des données intermédiaires
-output_folder = "data_output"  # dossier des données finales
-input_icv_folder = "data_input_icv"  # dossier des données brutes
-logs_folder = "logs"  # dossier des logs
+output_folder = "data_output"  # dossier des données finales (traitement par defaut)
+output_folder1 = "data_output1"  # dossier des données finales (traitement pour viz1)
+output_folder2 = "data_output2"  # dossier des données finales (traitement pour viz2)
+output_folder3 = "data_output3"  # dossier des données finales (traitement pour viz3)
+
 
 # traitements simplifiés par PR de début (True) ou traitements standards par couple de PR (False, traitements par défaut)
 is_localization_simplified = False
@@ -29,8 +33,7 @@ is_localization_simplified = False
 # borne inférieure : 1er janvier 2010 ; format : année, mois, jour
 date_min = datetime.date(2023, 1, 1)
 date_max = datetime.date(2024, 1, 1)
-dates_itv = [[date_min, date_max]]
-
+dates_itv = ([date_min, date_max],)
 
 # noms d'item decrivant le réseau, permet de retrouver les données de référence sur le réseau dans input_folder
 data_reseau_ref = [

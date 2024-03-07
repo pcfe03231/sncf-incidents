@@ -12,7 +12,7 @@ from matching import matching
 
 def preprocessing_icd(df, date_min, date_max):
     """
-    Nettoyage d'un fichier csv pour une année (1 incident par ligne)
+    Nettoyage d'un fichier csv pour une année (1 incident par ligne du fichier).
     """
 
     logging.info("start")
@@ -21,43 +21,54 @@ def preprocessing_icd(df, date_min, date_max):
     df["IO - Date de début"] = pd.to_datetime(df["IO - Date de début"], format="mixed")
     df["IO - Date de fin"] = pd.to_datetime(df["IO - Date de fin"], format="mixed")
 
-    # si date_de_debut > date_de_fin, correction date_de_fin en remplaçant par le lendemain de date_de_debut (sans l'heure)
+    # si date_de_debut > date_de_fin, correction de date_de_fin en remplaçant par le lendemain de date_de_debut (sans l'heure)
     mask = df["IO - Date de début"].dt.strftime("%Y-%m-%d") > df["IO - Date de fin"]
     df.loc[mask, "IO - Date de fin"] = (
         df["IO - Date de début"] + pd.to_timedelta(1, unit="d")
     ).dt.strftime("%Y-%m-%d")
 
-    # sélectionner les incidents dans l'intervalle de temps
+    # sélection des incidents dans l'intervalle de temps
     df = df.loc[
         (df["IO - Date de début"] >= pd.to_datetime(date_min))
         & (df["IO - Date de fin"] <= pd.to_datetime(date_max)),
         :,
     ]
 
-    # ajouter l'heure à la date de début d'incident
+    # ajout de l'heure à la date de début d'incident
     df.loc[:, "EC - Heure"] = pd.to_timedelta(df["EC - Heure"], unit="h")
     df.loc[:, "IO - Date de début"] = (
         df.loc[:, "IO - Date de début"] + df.loc[:, "EC - Heure"]
     )
 
-    # dataframe avec 1 ligne = 1 incident, incident le plus récent gardé, colonne "commentaires" contient le liste de tous les "IO - Commentaires 1"
-    df = df.groupby(by="IO - Numéro d'incident", as_index=False).agg(
-        date_de_debut_min=pd.NamedAgg(column="IO - Date de début", aggfunc="min"),
-        date_de_fin_max=pd.NamedAgg(column="IO - Date de fin", aggfunc="max"),
-        type_incident=pd.NamedAgg(column="IO - Type d'incident", aggfunc=lambda x: x),
-        type_def=pd.NamedAgg(column="IO - Type de défaillance", aggfunc=lambda x: x),
-        type_res_def=pd.NamedAgg(
-            column="IO - Type de ressource défaillante", aggfunc=lambda x: x
-        ),
-        pr_debut=pd.NamedAgg(column="IO - Libellé PR (PR début)", aggfunc=lambda x: x),
-        pr_fin=pd.NamedAgg(column="IO - Libellé PR (PR fin)", aggfunc=lambda x: x),
-        nb_perturbations_trains=pd.NamedAgg(
-            column="Nbre trains impactés", aggfunc="sum"
-        ),
-        nb_suppressions_trains=pd.NamedAgg(column="Nbre trains suppr", aggfunc="sum"),
-        nb_minutes_perdues=pd.NamedAgg(column="Minutes perdues", aggfunc="sum"),
+    # dataframe avec 1 ligne = 1 incident via un groupby sur les identifiants, incident le plus récent gardé, colonne "IO - Commentaires 1" non gardée
+    df = (
+        df.groupby(by="IO - Numéro d'incident", as_index=False)
+        .agg(
+            date_de_debut_min=pd.NamedAgg(column="IO - Date de début", aggfunc="min"),
+            date_de_fin_max=pd.NamedAgg(column="IO - Date de fin", aggfunc="max"),
+            type_incident=pd.NamedAgg(
+                column="IO - Type d'incident", aggfunc=lambda x: x
+            ),
+            type_def=pd.NamedAgg(
+                column="IO - Type de défaillance", aggfunc=lambda x: x
+            ),
+            type_res_def=pd.NamedAgg(
+                column="IO - Type de ressource défaillante", aggfunc=lambda x: x
+            ),
+            pr_debut=pd.NamedAgg(
+                column="IO - Libellé PR (PR début)", aggfunc=lambda x: x
+            ),
+            pr_fin=pd.NamedAgg(column="IO - Libellé PR (PR fin)", aggfunc=lambda x: x),
+            nb_perturbations_trains=pd.NamedAgg(
+                column="Nbre trains impactés", aggfunc="sum"
+            ),
+            nb_suppressions_trains=pd.NamedAgg(
+                column="Nbre trains suppr", aggfunc="sum"
+            ),
+            nb_minutes_perdues=pd.NamedAgg(column="Minutes perdues", aggfunc="sum"),
+        )
+        .rename(columns={"IO - Numéro d'incident": "numero"})
     )
-    df.rename(columns={"IO - Numéro d'incident": "numero"}, inplace=True)
 
     # si une colonne ne contient que les mêmes valeurs, mettre en str, sinon mettre les valeurs dans une liste de str
     def unlist(x):
@@ -87,7 +98,7 @@ def preprocessing_icd(df, date_min, date_max):
 
 def join_definition_incident(df):
     """
-    Jointure avec referentiel_definition_incident, pour rajouter la colonne 'infra'
+    Jointure avec referentiel_definition_incident, pour rajouter la colonne 'infra'.
     '"""
 
     logging.info("start")
@@ -117,13 +128,13 @@ def init_data_icd(**kwargs):
     date_min = get_kwargs(kwargs, "date_min")
     date_max = get_kwargs(kwargs, "date_max")
 
-    # récupérer les noms de fichiers d'incidents dans input_folder et créer le df total vide
+    # récupérer les noms de fichiers d'incidents dans input_folder et créer le df total vide avec les colonnes adaptées
     input_files = sorted(glob(os.path.join(input_folder, "incidents_*.csv")))
     df_tot = pd.DataFrame(None, columns=cols_icd_preprocess)
 
     for input_file in input_files:
         # importer le csv pour une année, avec uniquement les colonnes nécessaires au preprocessing
-        df_file = import_data(*os.path.split(input_file))
+        df_file = import_data(*os.path.split(input_file), usecols=usecols_icd)
 
         # preprocess le df de l'iteration (1 accident par ligne)
         df = preprocessing_icd(df_file, date_min, date_max)
